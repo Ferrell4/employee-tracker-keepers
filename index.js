@@ -67,3 +67,29 @@ function mainMenu(){
       console.log(err);
     });
 }
+
+// Console  logs a table of all current employees
+function viewAllEmployees() {
+    connection.query(
+      `SELECT 
+       employee.id, 
+       CONCAT (employee.first_name, " ", employee.last_name) AS name, 
+       role.title, 
+       role.salary,
+       CONCAT (manager.first_name, " ", manager.last_name) AS manager,
+       department.name AS department 
+       FROM employee 
+       JOIN role ON employee.role_id = role.id
+       JOIN department ON role.department_id = department.id
+       LEFT JOIN employee manager ON employee.manager_id = manager.id`,
+      function (err, result) {
+        if (err) {
+          console.log(err);
+        }
+        console.table(result);
+        mainMenu();
+      }
+    );
+  }
+// executes the function
+mainMenu();
