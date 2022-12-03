@@ -144,5 +144,50 @@ function addEmployee() {
       );
     });
 }
+
+// for updating the current employee information
+function updateRole() {
+    inquier
+      .prompt([
+        {
+          type: "input",
+          name: "employee",
+          message: "What is the id of the employee you wish to update?",
+        },
+        {
+          type: "input",
+          name: "role",
+          message:
+            "What is the id of the new role you wish to assign this employee",
+        },
+      ])
+      .then((data) => {
+        connection.query(
+          "UPDATE employee SET role_id = ? WHERE id = ?",
+          [data.role, data.employee],
+          function (err, result) {
+            if (err) throw err;
+          }
+        );
+        connection.query(
+          `SELECT 
+           employee.id, 
+          CONCAT (employee.first_name, " ", employee.last_name) AS name, 
+          role.title, 
+          role.salary,
+          CONCAT (manager.first_name, " ", manager.last_name) AS manager,
+          department.name AS department 
+          FROM employee 
+          JOIN role ON employee.role_id = role.id
+          JOIN department ON role.department_id = department.id
+          LEFT JOIN employee manager ON employee.manager_id = manager.id`,
+          function (err, result) {
+              if (err) throw err;
+            console.table(result);
+            mainMenu();
+          }
+        );
+      });
+  }
 // executes the function
 mainMenu();
