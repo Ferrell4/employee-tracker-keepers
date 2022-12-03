@@ -235,5 +235,49 @@ function addRole() {
       );
     });
 }
+
+// console logs a table of all current departments
+function viewAllDepartments() {
+  connection.query("SELECT * FROM department", function (err, result) {
+    if (err) {
+      console.log(err);
+    }
+    console.table(result);
+    mainMenu();
+  });
+}
+
+// allows users to create a new department
+function addDepartment() {
+  inquier
+    .prompt([
+      {
+        type: "input",
+        name: "name",
+        message: "What is the name of your new department?",
+      },
+    ])
+    .then((data) => {
+      connection.query(
+        "INSERT INTO department (name) VALUES (?)",
+        [data.name],
+        function (err, result) {
+          if (err) throw err;
+        }
+      );
+
+      connection.query("SELECT * FROM department", function (err, result) {
+        if (err) throw err;
+        console.table(result);
+        mainMenu();
+      });
+    });
+}
+
+// ends the program
+function exit() {
+  console.log("Goodbye!");
+  process.exit();
+}
 // executes the function
 mainMenu();
