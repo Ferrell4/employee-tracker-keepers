@@ -147,30 +147,30 @@ function addEmployee() {
 
 // for updating the current employee information
 function updateRole() {
-    inquier
-      .prompt([
-        {
-          type: "input",
-          name: "employee",
-          message: "What is the id of the employee you wish to update?",
-        },
-        {
-          type: "input",
-          name: "role",
-          message:
-            "What is the id of the new role you wish to assign this employee",
-        },
-      ])
-      .then((data) => {
-        connection.query(
-          "UPDATE employee SET role_id = ? WHERE id = ?",
-          [data.role, data.employee],
-          function (err, result) {
-            if (err) throw err;
-          }
-        );
-        connection.query(
-          `SELECT 
+  inquier
+    .prompt([
+      {
+        type: "input",
+        name: "employee",
+        message: "What is the id of the employee you wish to update?",
+      },
+      {
+        type: "input",
+        name: "role",
+        message:
+          "What is the id of the new role you wish to assign this employee",
+      },
+    ])
+    .then((data) => {
+      connection.query(
+        "UPDATE employee SET role_id = ? WHERE id = ?",
+        [data.role, data.employee],
+        function (err, result) {
+          if (err) throw err;
+        }
+      );
+      connection.query(
+        `SELECT 
            employee.id, 
           CONCAT (employee.first_name, " ", employee.last_name) AS name, 
           role.title, 
@@ -181,13 +181,59 @@ function updateRole() {
           JOIN role ON employee.role_id = role.id
           JOIN department ON role.department_id = department.id
           LEFT JOIN employee manager ON employee.manager_id = manager.id`,
-          function (err, result) {
-              if (err) throw err;
-            console.table(result);
-            mainMenu();
-          }
-        );
-      });
-  }
+        function (err, result) {
+          if (err) throw err;
+          console.table(result);
+          mainMenu();
+        }
+      );
+    });
+}
+
+// allows user to create a new role and to assign the role to a specific department
+function addRole() {
+  inquier
+    .prompt([
+      {
+        type: "input",
+        name: "title",
+        message: "What is the title of your new role?",
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is this roles annual salary?",
+      },
+      {
+        type: "input",
+        name: "deptId",
+        message: "What is this roles department id?",
+      },
+    ])
+    .then((data) => {
+      connection.query(
+        "INSERT INTO role (title, salary, department_id) VALUES (?,?,?);",
+        [data.title, data.salary, data.deptId],
+        function (err, result) {
+          if (err) throw err;
+        }
+      );
+      connection.query(
+        `SELECT 
+          role.id, 
+          role.title, 
+          role.salary, 
+          department.name AS department 
+          FROM role 
+          JOIN department 
+          ON role.department_id = department.id`,
+        function (err, result) {
+          if (err) throw err;
+          console.table(result);
+          mainMenu();
+        }
+      );
+    });
+}
 // executes the function
 mainMenu();
